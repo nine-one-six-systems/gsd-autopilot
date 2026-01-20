@@ -29,6 +29,7 @@ Parse command arguments and read config:
 MAX_ITERATIONS=$(cat .planning/config.json 2>/dev/null | grep -o '"max_iterations"[[:space:]]*:[[:space:]]*[0-9]*' | grep -o '[0-9]*' || echo "50")
 COST_LIMIT=$(cat .planning/config.json 2>/dev/null | grep -o '"cost_limit"[[:space:]]*:[[:space:]]*[0-9.]*\|null' | grep -o '[0-9.]*\|null' | head -1 || echo "null")
 AUTO_CONTINUE=$(cat .planning/config.json 2>/dev/null | grep -o '"auto_continue"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+UNATTENDED=$(cat .planning/config.json 2>/dev/null | grep -o '"unattended"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "false")
 PHASE_ONLY=false
 GOAL_FILE=""
 
@@ -46,6 +47,9 @@ for arg in "$@"; do
       PHASE_ONLY=true
       AUTO_CONTINUE=false
       ;;
+    --unattended)
+      UNATTENDED=true
+      ;;
     --goal=*)
       GOAL_FILE="${arg#*=}"
       ;;
@@ -61,12 +65,14 @@ fi
 **Arguments:**
 - `--max-iterations N` — Stop after N iterations (default: from config or 50)
 - `--phase-only` — Stop after current phase completes (overrides auto_continue)
+- `--unattended` — Auto-approve human verification prompts (no manual UAT)
 - `--goal=FILE` — Read additional success criteria from file (optional)
 
 **Config options:**
 - `autopilot.max_iterations` — Default max iterations (default: 50)
 - `autopilot.cost_limit` — Maximum cost in USD (null = no limit)
 - `autopilot.auto_continue` — Auto-transition to next phase (default: true)
+- `autopilot.unattended` — Auto-approve human verification prompts (default: false)
 
 Store values for use throughout workflow.
 </step>
@@ -278,7 +284,10 @@ Started: {timestamp if iteration 1}
 Last position: {CURRENT_POSITION}
 Stuck count: {STUCK_COUNT}
 Current action: {ACTION}
+Unattended: {UNATTENDED}
 ```
+
+**If `UNATTENDED=true`:** Human verification prompts will be auto-approved. The execute-phase workflow checks for this marker and skips UAT prompts.
 
 **Execute based on action:**
 
@@ -411,6 +420,7 @@ Started: 2025-01-20T10:30:00Z
 Last position: Phase: 3 of 5 | Plan: 2 of 3
 Stuck count: 0
 Current action: EXECUTE
+Unattended: true
 ```
 
 **When autopilot completes or is stopped:**
@@ -427,6 +437,7 @@ This enables:
 - Resuming autopilot after context reset
 - Debugging why autopilot stopped
 - Tracking iteration history
+- Execute-phase can check `Unattended:` to auto-approve UAT
 </state_tracking>
 
 <escape_valves>

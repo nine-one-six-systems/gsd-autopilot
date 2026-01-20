@@ -1,7 +1,7 @@
 ---
 name: gsd:autopilot
 description: Run GSD in continuous loop mode until milestone complete (Ralph Wiggum style)
-argument-hint: "[--max-iterations N] [--phase-only]"
+argument-hint: "[--max-iterations N] [--phase-only] [--unattended]"
 allowed-tools:
   - Read
   - Write
@@ -24,6 +24,7 @@ Inspired by the Ralph Wiggum Loop: each iteration gets fresh context, progress a
 - Detects stuck loops (same position for N iterations)
 - Supports BLOCKED sentinel for manual escape
 - Fresh subagent context per phase execution
+- `--unattended` mode auto-approves human verification (UAT) prompts
 </objective>
 
 <execution_context>
@@ -35,12 +36,17 @@ Inspired by the Ralph Wiggum Loop: each iteration gets fresh context, progress a
 
 The workflow handles all loop logic including:
 
-1. Argument parsing (--max-iterations, --phase-only)
+1. Argument parsing (--max-iterations, --phase-only, --unattended)
 2. STATE.md position detection
 3. Route to appropriate action (plan/execute/transition)
 4. Execute action with forced YOLO mode
 5. Update iteration tracking
 6. Loop back or exit based on conditions
+
+**Flags:**
+- `--max-iterations N` — Stop after N iterations (default: 50)
+- `--phase-only` — Stop after current phase completes
+- `--unattended` — Auto-approve human verification prompts (no manual UAT)
 
 **Escape conditions:**
 - Milestone complete

@@ -435,6 +435,36 @@ Phase goal verified. Proceed to update_roadmap.
 
 **If human_needed:**
 
+First, check if autopilot unattended mode is active:
+
+```bash
+# Check for unattended mode in STATE.md (set by autopilot)
+UNATTENDED=$(grep "^Unattended:" .planning/STATE.md 2>/dev/null | grep -o 'true\|false' || echo "false")
+```
+
+**If `UNATTENDED=true`:** Auto-approve and continue:
+
+```markdown
+## ✓ Phase {X}: {Name} — Human Verification Auto-Approved
+
+⚠️ **UNATTENDED MODE** — Human verification items were auto-approved.
+
+{N} items would normally require human testing:
+
+{Extract from VERIFICATION.md human_verification section}
+
+**Auto-approved at:** {timestamp}
+**Reason:** Autopilot running with --unattended flag
+
+> Review these items manually when convenient. Any issues can be caught in later phases or during milestone completion.
+
+Continuing to update_roadmap...
+```
+
+Log the auto-approval to VERIFICATION.md for audit trail, then continue to update_roadmap.
+
+**If `UNATTENDED=false`:** Prompt the user as normal:
+
 ```markdown
 ## ✓ Phase {X}: {Name} — Human Verification Required
 

@@ -21,7 +21,8 @@ Configuration options for `.planning/` directory behavior.
   "autopilot": {
     "max_iterations": 50,
     "cost_limit": null,
-    "auto_continue": true
+    "auto_continue": true,
+    "unattended": false
   }
 }
 ```
@@ -33,6 +34,7 @@ Configuration options for `.planning/` directory behavior.
 | `autopilot.max_iterations` | `50` | Maximum iterations before autopilot stops |
 | `autopilot.cost_limit` | `null` | Maximum cost in USD (null = no limit) |
 | `autopilot.auto_continue` | `true` | Automatically continue to next phase (false = stop at phase boundaries) |
+| `autopilot.unattended` | `false` | Auto-approve human verification prompts (true = fully autonomous) |
 </config_schema>
 
 <commit_docs_behavior>
@@ -130,13 +132,20 @@ Control autonomous loop behavior:
 - `true`: Automatically transition to next phase
 - `false`: Stop at phase boundaries (equivalent to `--phase-only`)
 
+**`autopilot.unattended`** (default: `false`)
+- `false`: Pause for human verification (UAT) prompts
+- `true`: Auto-approve human verification prompts for fully autonomous operation
+- Override with `--unattended` flag
+- Auto-approvals are logged to VERIFICATION.md for audit trail
+
 **Example config:**
 ```json
 {
   "autopilot": {
     "max_iterations": 100,
     "cost_limit": 50.0,
-    "auto_continue": true
+    "auto_continue": true,
+    "unattended": true
   }
 }
 ```
