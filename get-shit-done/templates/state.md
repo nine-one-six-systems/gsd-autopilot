@@ -66,6 +66,19 @@ None yet.
 
 None yet.
 
+## Autopilot Status
+
+[Only present when autopilot is active or was recently used]
+
+Mode: [Active | Inactive]
+Iteration: [N] of [MAX]
+Started: [YYYY-MM-DDTHH:MM:SSZ]
+Last position: [Phase: X of Y | Plan: A of B]
+Stuck count: [N]
+Current action: [PLAN | EXECUTE | VERIFY | TRANSITION | COMPLETE_MILESTONE]
+
+**Manual escape:** Add `BLOCKED: reason` to stop autopilot
+
 ## Session Continuity
 
 Last session: [YYYY-MM-DD HH:MM]
@@ -201,6 +214,7 @@ The goal is "read once, know where we are" — if it's too long, that fails.
 - Current Position: Where we are now (phase, plan, status)
 - Performance Metrics: Velocity tracking
 - Accumulated Context: Recent decisions, pending todos, blockers
+- Autopilot Status: Loop tracking (when autopilot active)
 - Session Continuity: Resume information
 
 </guidelines>

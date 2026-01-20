@@ -14,16 +14,18 @@ const HOOKS_DIR = path.join(__dirname, '..', 'hooks');
 const DIST_DIR = path.join(HOOKS_DIR, 'dist');
 
 // Hooks that need bundling (have npm dependencies)
+// Output as .cjs for ESM compatibility (projects with "type": "module")
 const HOOKS_TO_BUNDLE = [
-  'gsd-intel-index.js'
+  { src: 'gsd-intel-index.js', dest: 'gsd-intel-index.cjs' }
 ];
 
 // Hooks that are pure Node.js (just copy)
+// Output as .cjs for ESM compatibility
 const HOOKS_TO_COPY = [
-  'gsd-intel-session.js',
-  'gsd-intel-prune.js',
-  'gsd-check-update.js',
-  'gsd-statusline.js'
+  { src: 'gsd-intel-session.js', dest: 'gsd-intel-session.cjs' },
+  { src: 'gsd-intel-prune.js', dest: 'gsd-intel-prune.cjs' },
+  { src: 'gsd-check-update.js', dest: 'gsd-check-update.cjs' },
+  { src: 'gsd-statusline.js', dest: 'gsd-statusline.cjs' }
 ];
 
 async function build() {
@@ -34,15 +36,15 @@ async function build() {
 
   // Bundle hooks with dependencies
   for (const hook of HOOKS_TO_BUNDLE) {
-    const entryPoint = path.join(HOOKS_DIR, hook);
-    const outfile = path.join(DIST_DIR, hook);
+    const entryPoint = path.join(HOOKS_DIR, hook.src);
+    const outfile = path.join(DIST_DIR, hook.dest);
 
     if (!fs.existsSync(entryPoint)) {
-      console.warn(`Warning: ${hook} not found, skipping`);
+      console.warn(`Warning: ${hook.src} not found, skipping`);
       continue;
     }
 
-    console.log(`Bundling ${hook}...`);
+    console.log(`Bundling ${hook.src} -> ${hook.dest}...`);
 
     await esbuild.build({
       entryPoints: [entryPoint],
@@ -73,15 +75,15 @@ async function build() {
 
   // Copy pure Node.js hooks (no bundling needed)
   for (const hook of HOOKS_TO_COPY) {
-    const src = path.join(HOOKS_DIR, hook);
-    const dest = path.join(DIST_DIR, hook);
+    const src = path.join(HOOKS_DIR, hook.src);
+    const dest = path.join(DIST_DIR, hook.dest);
 
     if (!fs.existsSync(src)) {
-      console.warn(`Warning: ${hook} not found, skipping`);
+      console.warn(`Warning: ${hook.src} not found, skipping`);
       continue;
     }
 
-    console.log(`Copying ${hook}...`);
+    console.log(`Copying ${hook.src} -> ${hook.dest}...`);
     fs.copyFileSync(src, dest);
     console.log(`  → ${dest}`);
   }

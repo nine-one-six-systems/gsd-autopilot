@@ -4,16 +4,35 @@ Configuration options for `.planning/` directory behavior.
 
 <config_schema>
 ```json
-"planning": {
+{
+  "mode": "yolo|interactive",
+  "depth": "quick|standard|comprehensive",
+  "parallelization": true,
   "commit_docs": true,
-  "search_gitignored": false
+  "planning": {
+    "commit_docs": true,
+    "search_gitignored": false
+  },
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true
+  },
+  "autopilot": {
+    "max_iterations": 50,
+    "cost_limit": null,
+    "auto_continue": true
+  }
 }
 ```
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `commit_docs` | `true` | Whether to commit planning artifacts to git |
-| `search_gitignored` | `false` | Add `--no-ignore` to broad rg searches |
+| `planning.commit_docs` | `true` | Whether to commit planning artifacts to git |
+| `planning.search_gitignored` | `false` | Add `--no-ignore` to broad rg searches |
+| `autopilot.max_iterations` | `50` | Maximum iterations before autopilot stops |
+| `autopilot.cost_limit` | `null` | Maximum cost in USD (null = no limit) |
+| `autopilot.auto_continue` | `true` | Automatically continue to next phase (false = stop at phase boundaries) |
 </config_schema>
 
 <commit_docs_behavior>
@@ -90,5 +109,47 @@ To use uncommitted mode:
    ```
 
 </setup_uncommitted_mode>
+
+<autopilot_config>
+
+## Autopilot Configuration
+
+Control autonomous loop behavior:
+
+**`autopilot.max_iterations`** (default: `50`)
+- Maximum iterations before autopilot stops
+- Prevents runaway loops
+- Override with `--max-iterations` flag
+
+**`autopilot.cost_limit`** (default: `null`)
+- Maximum cost in USD before autopilot stops
+- Requires cost tracking implementation
+- `null` = no cost limit
+
+**`autopilot.auto_continue`** (default: `true`)
+- `true`: Automatically transition to next phase
+- `false`: Stop at phase boundaries (equivalent to `--phase-only`)
+
+**Example config:**
+```json
+{
+  "autopilot": {
+    "max_iterations": 100,
+    "cost_limit": 50.0,
+    "auto_continue": true
+  }
+}
+```
+
+**Reading autopilot config:**
+```bash
+# Read max_iterations (default: 50)
+MAX_ITERATIONS=$(cat .planning/config.json 2>/dev/null | grep -o '"max_iterations"[[:space:]]*:[[:space:]]*[0-9]*' | grep -o '[0-9]*' || echo "50")
+
+# Read auto_continue (default: true)
+AUTO_CONTINUE=$(cat .planning/config.json 2>/dev/null | grep -o '"auto_continue"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+```
+
+</autopilot_config>
 
 </planning_config>

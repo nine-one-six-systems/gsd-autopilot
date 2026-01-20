@@ -140,6 +140,27 @@ Execute all plans in a phase.
 
 Usage: `/gsd:execute-phase 5`
 
+### Autopilot Mode
+
+**`/gsd:autopilot [--max-iterations N] [--phase-only]`**
+Run GSD in continuous loop until milestone complete (Ralph Wiggum style).
+
+- Automatically cycles through plan → execute → verify → transition
+- Each iteration gets fresh subagent context
+- Forces YOLO mode internally (no confirmation prompts)
+- Tracks iteration count in STATE.md
+- Built-in escape valves: max iterations, stuck detection, BLOCKED sentinel
+
+**Escape conditions:**
+- Milestone complete (success)
+- `--max-iterations` limit reached (default: 50)
+- `BLOCKED: reason` added to STATE.md (manual escape)
+- Stuck detection (same position for 3+ iterations)
+
+Usage: `/gsd:autopilot`
+Usage: `/gsd:autopilot --max-iterations=30`
+Usage: `/gsd:autopilot --phase-only`
+
 ### Quick Mode
 
 **`/gsd:quick`**
@@ -465,6 +486,20 @@ Example config:
 /gsd:plan-phase 1       # Create plans for first phase
 /clear
 /gsd:execute-phase 1    # Execute all plans in phase
+```
+
+**Autonomous execution (Ralph Wiggum style):**
+
+```
+/gsd:new-project        # Set up project first
+/clear
+/gsd:autopilot          # Let it run until milestone complete
+```
+
+Or for a single phase at a time:
+
+```
+/gsd:autopilot --phase-only   # Stop after current phase
 ```
 
 **Resuming work after a break:**
